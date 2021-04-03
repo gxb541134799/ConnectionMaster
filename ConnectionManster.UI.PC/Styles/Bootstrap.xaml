@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Styles/Window.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/Label.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/Panel.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/Button.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/DataGrid.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/ProgressBar.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/FormControl.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/InputGroup.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/Path.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/ScrollBar.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/Menu.xaml"></ResourceDictionary>
+        <ResourceDictionary Source="/Styles/DatePicker.xaml"></ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

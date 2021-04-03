@@ -1,0 +1,34 @@
+<UserControl x:Class="ConnectionManster.UI.PC.Views.MessageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ConnectionManster.UI.PC.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding SendCommand}" Key="S" Modifiers="Alt"/>
+    </UserControl.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBox Text="{Binding Logger.Text,Mode=OneWay}" Style="{StaticResource TextArea}" IsReadOnly="True" Margin="0,0,0,5">
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="全选" Command="SelectAll"/>
+                    <MenuItem Header="复制" Command="Copy"/>
+                    <MenuItem Header="清空" Command="{Binding Logger.ClearCommand}"/>
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
+        <TextBox Text="{Binding Message,UpdateSourceTrigger=PropertyChanged,Delay=100}" Style="{StaticResource TextArea}" Margin="0,5,0,0" Grid.Row="1"></TextBox>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Right" Grid.Row="2">
+            <local:FormatterSelectView DataContext="{Binding FormatterViewModel}"/>
+            <CheckBox IsChecked="{Binding ClearMessageAfterSend}" Style="{StaticResource Checkbox Has-Warning}" Margin="10,0" VerticalAlignment="Center">发送后清空</CheckBox>
+            <Button Content="发送(Alt+S)" Command="{Binding SendCommand}" Margin="10,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
