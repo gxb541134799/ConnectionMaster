@@ -1,0 +1,78 @@
+<UserControl x:Class="ConnectionManster.UI.PC.Views.ByteConvertView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ConnectionManster.UI.PC.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        
+        <TextBox Text="{Binding Output,Mode=OneWay}" IsReadOnly="True" Style="{StaticResource TextArea}"/>
+        <Button Margin="0,10" Style="{StaticResource IconButton}" Height="16" Command="{Binding SwitchCommand}" Grid.Row="1">
+            <Path Data="{StaticResource Glyphicon-Arrow-Up}" Stretch="Uniform"
+                  Fill="Black"/>
+        </Button>
+        <TextBox Text="{Binding Input,UpdateSourceTrigger=PropertyChanged,Delay=100}" Style="{StaticResource TextArea}" Grid.Row="2"/>
+        <ScrollViewer Margin="10,0,0,0" VerticalScrollBarVisibility="Auto" Grid.RowSpan="4" Grid.Column="1">
+            <StackPanel>
+                <GroupBox Header="数值转换">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Int16至字节" Command="{Binding Int16ToBytesCommand}"/>
+                            <Button Content="字节至Int16" Command="{Binding ToInt16Command}" Margin="15,0"/>
+                            <Button Content="UInt16至字节" Command="{Binding UInt16ToBytesCommand}"/>
+                            <Button Content="字节至UInt16" Command="{Binding ToUInt16Command}" Margin="15,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                            <Button Content="Int32至字节" Command="{Binding Int32ToBytesCommand}"/>
+                            <Button Content="字节至Int32" Command="{Binding ToInt32Command}" Margin="15,0"/>
+                            <Button Content="UInt32至字节" Command="{Binding UInt32ToBytesCommand}"/>
+                            <Button Content="字节至UInt32" Command="{Binding ToUInt32Command}" Margin="15,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Int64至字节" Command="{Binding Int64ToBytesCommand}"/>
+                            <Button Content="字节至Int64" Command="{Binding ToInt64Command}" Margin="15,0"/>
+                            <Button Content="UInt64至字节" Command="{Binding UInt64ToBytesCommand}"/>
+                            <Button Content="字节至UInt64" Command="{Binding ToUInt64Command}" Margin="15,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                            <Button Content="单精度至字节" Command="{Binding FloatToBytesCommand}"/>
+                            <Button Content="字节至单精度" Command="{Binding ToFloatCommand}" Margin="15,0"/>
+                            <Button Content="双精度至字节" Command="{Binding DoubleToBytesCommand}"/>
+                            <Button Content="字节至双精度" Command="{Binding ToDoubleCommand}" Margin="15,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsLittleEndian}" Content="小端"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="其他" Margin="0,10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Base64加密" Command="{Binding ToBase64Command}"/>
+                            <Button Content="Base64解密" Command="{Binding FromBase64Command}" Margin="15,0"/>
+                            <Button Content="计算CRC" Command="{Binding ToCRCCommand}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                            <TextBlock Text="类型："/>
+                            <ComboBox ItemsSource="{Binding HashNames}" SelectedItem="{Binding HashName}"/>
+                            <Button Content="计算" Command="{Binding ToHashCommand}" Margin="15,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <local:FormatterSelectView DataContext="{Binding FormatterViewModel}"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

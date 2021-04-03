@@ -1,0 +1,88 @@
+<Application x:Class="ConnectionManster.UI.PC.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Styles/Bootstrap.xaml"/>
+                <ResourceDictionary Source="/PathGeometries/Glyphicons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="ListBox">
+                <Setter Property="BorderBrush" Value="{StaticResource FormControlBorderBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource FormControlForeground}"/>
+                <Setter Property="Background" Value="{StaticResource FormControlBackground}"/>
+            </Style>
+            <Style TargetType="TextBox" x:Key="TextArea" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="Height" Value="Auto"/>
+                <Setter Property="AcceptsReturn" Value="True"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Top"/>
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+            </Style>
+            <Style TargetType="Button" x:Key="OpenButton" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Content" Value="连接"/>
+                <Setter Property="Command" Value="{Binding OpenCommand}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsOpened}" Value="True">
+                        <Setter Property="Content" Value="断开"/>
+                        <Setter Property="Command" Value="{Binding CloseCommand}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="Button" x:Key="StartButton" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Content" Value="开始"/>
+                <Setter Property="Command" Value="{Binding StartCommand}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsStopped}" Value="False">
+                        <Setter Property="Content" Value="停止"/>
+                        <Setter Property="Command" Value="{Binding StopCommand}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="Button" x:Key="ScanButton" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Content" Value="扫描"/>
+                <Setter Property="Command" Value="{Binding ScanCommand}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Scanning}" Value="True">
+                        <Setter Property="Content" Value="取消"/>
+                        <Setter Property="Command" Value="{Binding CancelCommand}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="Button" x:Key="IconButton">
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}">
+                                <ContentPresenter ContentSource="Content" Margin="{TemplateBinding Padding}" 
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="ProgressBar" x:Key="ScannerProcessBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
+                <Setter Property="VirtualizingPanel.Visibility" Value="Hidden"/>
+                <Setter Property="Maximum" Value="{Binding Total}"/>
+                <Setter Property="Value" Value="{Binding Finished,Mode=OneWay}"/>
+                <Setter Property="Height" Value="25"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Scanning}" Value="True">
+                        <Setter Property="Visibility" Value="Visible"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

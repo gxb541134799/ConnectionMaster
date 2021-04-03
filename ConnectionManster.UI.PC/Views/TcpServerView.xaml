@@ -1,0 +1,37 @@
+<UserControl x:Class="ConnectionManster.UI.PC.Views.TcpServerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ConnectionManster.UI.PC.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="端口："/>
+            <TextBox Text="{Binding Port}" Width="80"/>
+            <TextBlock Text="接收超时(毫秒)：" Margin="10,0,0,0"/>
+            <TextBox Text="{Binding ReceiveTimeout}" Width="80"/>
+            <TextBlock Text="接收缓冲区(字节)：" Margin="10,0,0,0"/>
+            <TextBox Text="{Binding ReceiveBufferSize}" Width="80"/>
+            <Button Style="{StaticResource StartButton}" Margin="10,0"/>
+        </StackPanel>
+        <local:MessageView Margin="0,10,0,0" Grid.Row="1"/>
+        <TextBlock Text="客户端" Margin="10,0,0,0" Grid.Column="1"/>
+        <ListBox ItemsSource="{Binding Clients}" Width="200" Margin="10,10,0,0" Grid.Column="1" Grid.Row="1">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Value.RemotePoint}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
