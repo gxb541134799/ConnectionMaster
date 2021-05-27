@@ -141,20 +141,21 @@ namespace ConnectionManster.UI.PC.ViewModels
                     catch (OperationCanceledException)
                     {
                         Logger.Append($"接收{connection.RemotePoint}的消息超时");
-                        await connection.CloseAsync();
-                        OnConnectionClosed(connection);
-                        continue;
+                        break;
                     }
                     catch (Exception)
                     {
-                        await connection.CloseAsync();
-                        OnConnectionClosed(connection);
-                        continue;
+                        break;
+                    }
+                    if(result.Data.Length == 0)
+                    {
+                        break;
                     }
                     Logger.Append($"收到来自{connection.RemotePoint}的消息:{FormatterViewModel.Formatter.FromBytes(result.Data)}");
                 }
-                
             }
+            await connection.CloseAsync();
+            OnConnectionClosed(connection);
         }
 
         protected override async Task SendAsync()

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NatTest.Client": {
+      "commandName": "Project",
+      "commandLineArgs": "udp 12311 test 127.0.0.1 12310"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NatTest.Server": {
+      "commandName": "Project",
+      "commandLineArgs": "tcp 12310"
+    }
+  }
+}
