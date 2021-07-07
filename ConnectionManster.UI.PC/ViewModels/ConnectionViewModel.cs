@@ -104,6 +104,10 @@ namespace ConnectionManster.UI.PC.ViewModels
 
         private async void Close()
         {
+            if(!IsOpened)
+            {
+                return;
+            }
             try
             {
                 await Connection.CloseAsync();
