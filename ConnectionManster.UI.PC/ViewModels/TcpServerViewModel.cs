@@ -22,8 +22,8 @@ namespace ConnectionManster.UI.PC.ViewModels
         {
             FormatterViewModel = formatterViewModel;
             Clients = new ObservableCollection<Checkable<TcpConnection>>();
-            StartCommand = new Command(Start, () => IsStopped);
-            StopCommand = new Command(Stop, () => !IsStopped);
+            StartCommand = new AsyncCommand(StartAsync, () => IsStopped);
+            StopCommand = new AsyncCommand(StopAsync, () => !IsStopped);
         }
 
         public int Port { get; set; }
@@ -41,17 +41,17 @@ namespace ConnectionManster.UI.PC.ViewModels
         {
             get
             {
-                return Clients.Where(c => c.IsChecked).Select(c => c.Value);
+                return Clients.Where(c => c.IsChecked).Select(c =>c.Value);
             }
         }
 
         public FormatterViewModel FormatterViewModel { get; }
 
-        public Command StartCommand { get; }
+        public AsyncCommand StartCommand { get; }
 
-        public Command StopCommand { get; }
+        public AsyncCommand StopCommand { get; }
 
-        private void Start()
+        private async Task StartAsync()
         {
             if(!Validator.IsValidPort(Port))
             {
@@ -70,14 +70,14 @@ namespace ConnectionManster.UI.PC.ViewModels
             }
             IsStopped = false;
             Logger.Append($"开始监听{Port}端口");
-            BeginAccept();
+            await BeginAccept();
         }
 
-        private async void Stop()
+        private async Task StopAsync()
         {
-            foreach(var client in Clients)
+            while(Clients.Count > 0)
             {
-                await client.Value.CloseAsync();
+                await Clients[0].Value.CloseAsync();
             }
             try
             {
@@ -92,7 +92,7 @@ namespace ConnectionManster.UI.PC.ViewModels
             Logger.Append("端口监听已停止");
         }
 
-        private async void BeginAccept()
+        private async Task BeginAccept()
         {
             while (!IsStopped)
             {
@@ -114,10 +114,8 @@ namespace ConnectionManster.UI.PC.ViewModels
                 {
                     ReceiveBufferSize = ReceiveBufferSize
                 };
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    Clients.Add(new Checkable<TcpConnection>(connection, true));
-                });
+                connection.Closed += (sender, e) => OnConnectionClosed((TcpConnection)sender);
+                Clients.Add(new Checkable<TcpConnection>(connection, true));
                 Logger.Append($"{client.Client.RemoteEndPoint}已连接");
                 BeginReceive(connection);
             }
@@ -127,38 +125,35 @@ namespace ConnectionManster.UI.PC.ViewModels
         {
             while (connection.IsOpened)
             {
-                using(var source = new CancellationTokenSource())
+                var receiveTokenSource = new CancellationTokenSource();
+                if (ReceiveTimeout > 0)
                 {
-                    if(ReceiveTimeout > 0)
-                    {
-                        source.CancelAfter(ReceiveTimeout);
-                    }
-                    ReceiveResult result;
-                    try
-                    {
-                        result = await connection.ReceiveAsync(source.Token);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        Logger.Append($"接收{connection.RemotePoint}的消息超时");
-                        break;
-                    }
-                    catch (Exception)
-                    {
-                        break;
-                    }
-                    if(result.Data.Length == 0)
-                    {
-                        break;
-                    }
-                    Logger.Append($"收到来自{connection.RemotePoint}的消息:{FormatterViewModel.Formatter.FromBytes(result.Data)}");
+                    receiveTokenSource.CancelAfter(ReceiveTimeout);
                 }
+                ReceiveResult result;
+                try
+                {
+                    result = await connection.ReceiveAsync(receiveTokenSource.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    Logger.Append($"接收{connection.RemotePoint}的消息超时");
+                    break;
+                }
+                catch (Exception)
+                {
+                    break;
+                }
+                if (result.Data.Length == 0)
+                {
+                    break;
+                }
+                Logger.Append($"收到来自{connection.RemotePoint}的消息:{FormatterViewModel.Formatter.FromBytes(result.Data)}");
             }
             await connection.CloseAsync();
-            OnConnectionClosed(connection);
         }
 
-        protected override async Task SendAsync()
+        protected override async Task SendCoreAsync()
         {
             var selectedClients = SelectedClients.ToArray();
             var bytes = FormatterViewModel.Formatter.FromString(Message);

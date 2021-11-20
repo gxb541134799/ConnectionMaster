@@ -11,11 +11,11 @@ namespace ConnectionManster.UI.PC.ViewModels
 {
     public abstract class ConnectionViewModel : MessageViewModel
     {
-        public IBinaryConnection Connection { get; private set; }
+        public IBinaryConnection Connection { get; protected set; }
 
-        public Command OpenCommand { get; }
+        public AsyncCommand OpenCommand { get; }
 
-        public Command CloseCommand { get; }
+        public AsyncCommand CloseCommand { get; }
 
         private bool _isOpened;
         public bool IsOpened
@@ -30,18 +30,18 @@ namespace ConnectionManster.UI.PC.ViewModels
 
         protected ConnectionViewModel(FormatterViewModel formatterViewModel)
         {
-            OpenCommand = new Command(Open, () => !IsOpened);
-            CloseCommand = new Command(Close, () => IsOpened);
+            OpenCommand = new AsyncCommand(OpenAsync, () => !IsOpened);
+            CloseCommand = new AsyncCommand(CloseAsync, () => IsOpened);
             FormatterViewModel = formatterViewModel;
         }
 
-        protected override async Task SendAsync()
+        protected override async Task SendCoreAsync()
         {
             var bytes = FormatterViewModel.Formatter.FromString(Message);
             await Connection.SendAsync(bytes, 0, bytes.Length);
         }
 
-        private async void Open()
+        private async Task OpenAsync()
         {
             string error;
             if(!Validate(out error))
@@ -50,6 +50,7 @@ namespace ConnectionManster.UI.PC.ViewModels
                 return;
             }
             Connection = CreateConnection();
+            Connection.Closed += Connection_Closed;
             Connection.ReceiveBufferSize = ReceiveBufferSize;
             try
             {
@@ -65,44 +66,57 @@ namespace ConnectionManster.UI.PC.ViewModels
             BeginReceive();
         }
 
+        private void Connection_Closed(object sender, EventArgs e)
+        {
+            OnClosed();
+        }
+
+        protected virtual void OnClosed()
+        {
+            IsOpened = false;
+            Logger.Append("连接已关闭");
+        }
+
         private async void BeginReceive()
         {
             while(IsOpened)
             {
+                using var receiveTokenSource = new CancellationTokenSource();
                 ReceiveResult result;
-                using(var source = new CancellationTokenSource())
+                if (ReceiveTimeout > 0)
                 {
-                    if(ReceiveTimeout > 0)
-                    {
-                        source.CancelAfter(ReceiveTimeout);
-                    }
-                    try
-                    {
-                        result = await Connection.ReceiveAsync(source.Token);
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        continue;
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        OnReceiveTimeout();
-                        continue;
-                    }
-                    catch (Exception ex)
-                    {
-                        OnReceiveFail(ex);
-                        continue;
-                    }
-                    if (result.Data?.Length > 0)
-                    {
-                        OnReceivedMessage(result);
-                    }
+                    receiveTokenSource.CancelAfter(ReceiveTimeout);
+                }
+                try
+                {
+                    result = await Connection.ReceiveAsync(receiveTokenSource.Token);
+                }
+                catch (ObjectDisposedException)
+                {
+                    continue;
+                }
+                catch (OperationCanceledException)
+                {
+                    OnReceiveTimeout();
+                    continue;
+                }
+                catch (Exception ex)
+                {
+                    OnReceiveFail(ex);
+                    continue;
+                }
+                if (result.Data?.Length > 0)
+                {
+                    OnReceivedMessage(result);
+                }
+                else if(result.Data?.Length == 0)
+                {
+                    await CloseAsync();
                 }
             }
         }
 
-        private async void Close()
+        private async Task CloseAsync()
         {
             if(!IsOpened)
             {
@@ -117,8 +131,6 @@ namespace ConnectionManster.UI.PC.ViewModels
                 Logger.Append($"断开连接异常：{ex.Message}");
                 return;
             }
-            IsOpened = false;
-            Logger.Append("连接已关闭");
         }
 
         protected abstract IBinaryConnection CreateConnection();

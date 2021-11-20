@@ -11,7 +11,7 @@ namespace ConnectionManster.UI.PC.ViewModels
         protected MessageViewModel()
         {
             Logger = new LoggerViewModel();
-            SendCommand = new Command(Send, () => CanSend);
+            SendCommand = new AsyncCommand(SendAsync, () => CanSend);
         }
 
         private string _message;
@@ -29,7 +29,7 @@ namespace ConnectionManster.UI.PC.ViewModels
 
         public bool ClearMessageAfterSend { get; set; } = false;
 
-        public Command SendCommand { get; }
+        public AsyncCommand SendCommand { get; }
 
         public virtual bool CanSend
         {
@@ -39,11 +39,11 @@ namespace ConnectionManster.UI.PC.ViewModels
             }
         }
 
-        private async void Send()
+        private async Task SendAsync()
         {
             try
             {
-                await SendAsync();
+                await SendCoreAsync();
             }
             catch (Exception ex)
             {
@@ -56,7 +56,7 @@ namespace ConnectionManster.UI.PC.ViewModels
             }
         }
 
-        protected abstract Task SendAsync();
+        protected abstract Task SendCoreAsync();
 
         protected override void OnPropertyChanged(string propertyName)
         {

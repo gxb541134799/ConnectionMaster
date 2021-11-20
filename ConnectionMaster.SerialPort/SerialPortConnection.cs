@@ -26,11 +26,14 @@ namespace ConnectionMaster.SerialPort
 
         public int Delay { get; set; }
 
+        public event EventHandler Closed;
+
         public Task CloseAsync()
         {
             if (IsOpened)
             {
                 Port.Close();
+                Closed?.Invoke(this, EventArgs.Empty);
             }
             return Task.CompletedTask;
         }
@@ -53,14 +56,15 @@ namespace ConnectionMaster.SerialPort
             }
             var buffer = new Memory<byte>(new byte[ReceiveBufferSize]);
             var length =await Port.BaseStream.ReadAsync(buffer,cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             var bytes = buffer.Slice(0, length).ToArray();
             return new ReceiveResult(bytes);
         }
 
-        public Task SendAsync(byte[] message, int startIndex, int count,CancellationToken cancellationToken = default)
+        public async Task SendAsync(byte[] message, int startIndex, int count,CancellationToken cancellationToken = default)
         {
             EnsureIsOpened();
-            return Port.BaseStream.WriteAsync(message, startIndex, count,cancellationToken);
+            await Port.BaseStream.WriteAsync(message, startIndex, count,cancellationToken);
         }
 
         private void EnsureIsOpened()

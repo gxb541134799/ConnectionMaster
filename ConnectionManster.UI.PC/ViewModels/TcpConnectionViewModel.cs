@@ -33,9 +33,9 @@ namespace ConnectionManster.UI.PC.ViewModels
             return new TcpConnection(Dns.GetHostAddresses(IPOrHost)[0], Port);
         }
 
-        protected override async Task SendAsync()
+        protected override async Task SendCoreAsync()
         {
-            await base.SendAsync();
+            await base.SendCoreAsync();
             Logger.Append($"发送数据:{Message}");
         }
 

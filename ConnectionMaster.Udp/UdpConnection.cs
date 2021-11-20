@@ -29,12 +29,15 @@ namespace ConnectionMaster.Udp
 
         public ICollection<IPEndPoint> Receivers { get; }
 
+        public event EventHandler Closed;
+
         public Task CloseAsync()
         {
             if(IsOpened)
             {
                 client.Close();
                 IsOpened = false;
+                Closed?.Invoke(this, EventArgs.Empty);
             }
             return Task.CompletedTask;
         }

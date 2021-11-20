@@ -20,6 +20,11 @@ namespace ConnectionMaster.Core
         int ReceiveBufferSize { get; set; }
 
         /// <summary>
+        /// 连接已关闭事件
+        /// </summary>
+        event EventHandler Closed;
+
+        /// <summary>
         /// 异步打开连接
         /// </summary>
         /// <returns></returns>

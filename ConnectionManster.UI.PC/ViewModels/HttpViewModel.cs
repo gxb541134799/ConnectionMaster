@@ -39,7 +39,7 @@ namespace ConnectionManster.UI.PC.ViewModels
             };
             ContentType = ContentTypes.First();
 
-            SendCommand = new Command(Send,()=>!Sending);
+            SendCommand = new AsyncCommand(SendAsync,()=>!Sending);
             CancelCommand = new Command(Cancel, () => Sending);
         }
 
@@ -92,11 +92,11 @@ namespace ConnectionManster.UI.PC.ViewModels
             set { SetValue(ref _sending, value, nameof(Sending)); }
         }
 
-        public Command SendCommand { get; }
+        public AsyncCommand SendCommand { get; }
 
         public Command CancelCommand { get; }
 
-        private async void Send()
+        private async Task SendAsync()
         {
             Uri uri;
             if(!Uri.TryCreate(Url,UriKind.Absolute,out uri))

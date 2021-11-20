@@ -11,6 +11,8 @@ namespace ConnectionMaster.Tcp
     {
         private readonly TcpClient client;
 
+        public event EventHandler Closed;
+
         public TcpConnection(IPEndPoint remotePoint)
         {
             RemotePoint = remotePoint;
@@ -71,6 +73,7 @@ namespace ConnectionMaster.Tcp
             {
                 client.Close();
                 IsOpened = false;
+                Closed?.Invoke(this, EventArgs.Empty);
             }
             return Task.CompletedTask;
         }
@@ -99,6 +102,7 @@ namespace ConnectionMaster.Tcp
         {
             EnsureIsOpened();
             await client.GetStream().WriteAsync(new Memory<byte>(message,startIndex,count),cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         private void EnsureIsOpened()

@@ -56,7 +56,7 @@ namespace ConnectionManster.UI.PC.ViewModels
             });
         }
 
-        protected override async Task SendAsync()
+        protected override async Task SendCoreAsync()
         {
             var udpConnection = (UdpConnection)Connection;
             udpConnection.Receivers.Clear();
@@ -64,7 +64,7 @@ namespace ConnectionManster.UI.PC.ViewModels
             {
                 udpConnection.Receivers.Add(point);
             }
-            await base.SendAsync();
+            await base.SendCoreAsync();
             foreach(var point in udpConnection.Receivers)
             {
                 Logger.Append($"向{point}发送消息:{Message}");

@@ -15,7 +15,7 @@ namespace ConnectionManster.UI.PC.ViewModels
         protected ScannerViewModel()
         {
             Items = new ObservableCollection<T>();
-            ScanCommand = new Command(Scan, () => !Scanning);
+            ScanCommand = new AsyncCommand(ScanAsync, () => !Scanning);
             CancelCommand = new Command(Cancel, () => Scanning);
             ThreadCount = 10;
         }
@@ -61,7 +61,7 @@ namespace ConnectionManster.UI.PC.ViewModels
 
         public int ThreadCount { get; set; }
 
-        public Command ScanCommand { get; }
+        public AsyncCommand ScanCommand { get; }
 
         public Command CancelCommand { get; }
 
@@ -75,7 +75,7 @@ namespace ConnectionManster.UI.PC.ViewModels
             }
         }
 
-        private async void Scan()
+        private async Task ScanAsync()
         {
             string error;
             if(!Validate(out error))
